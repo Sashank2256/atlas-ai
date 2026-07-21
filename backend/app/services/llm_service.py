@@ -3,7 +3,7 @@ import ollama
 from app.core.config import settings
 
 
-class AIService:
+class LLMService:
     def chat(self, message: str) -> str:
         response = ollama.chat(
             model=settings.MODEL_NAME,
@@ -18,4 +18,4 @@ class AIService:
         return response["message"]["content"]
 
 
-ai_service = AIService()
+llm_service = LLMService()
