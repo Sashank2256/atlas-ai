@@ -1,22 +1,19 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
 
-from app.ai import chat_with_ai
+from app.api.routes import router
+from app.core.config import settings
 
-app = FastAPI(title="Atlas AI", version="1.0.0")
+app = FastAPI(
+    title=settings.APP_NAME,
+    version=settings.VERSION,
+)
 
-
-class ChatRequest(BaseModel):
-    message: str
+app.include_router(router)
 
 
 @app.get("/")
 def root():
-    return {"status": "running", "message": "Welcome to Atlas AI 🚀"}
-
-
-@app.post("/chat")
-def chat(request: ChatRequest):
-    answer = chat_with_ai(request.message)
-
-    return {"response": answer}
+    return {
+        "status": "running",
+        "message": f"Welcome to {settings.APP_NAME} 🚀",
+    }
