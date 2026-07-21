@@ -39,5 +39,8 @@ node_modules/
 # Ollama
 models/
 
+# Ruff
+.ruff_cache/
+
 # Misc
 *.swp
