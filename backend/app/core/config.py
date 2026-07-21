@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     MODEL_NAME: str = "qwen2.5-coder:7b"
     OLLAMA_HOST: str = "http://localhost:11434"
 
+    DATABASE_URL: str = "postgresql+psycopg://atlas:atlas@localhost:5432/atlas_ai"
+
     DEBUG: bool = True
 
     model_config = {
