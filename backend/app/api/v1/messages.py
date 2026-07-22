@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.api.dependencies import get_current_user, get_db
 from app.crud.conversation import get_conversation
 from app.crud.message import create_message, list_messages
-from app.db.session import SessionLocal
+from app.db.models.user import User
 from app.schemas import MessageCreate, MessageResponse
 
 router = APIRouter(
@@ -12,22 +13,15 @@ router = APIRouter(
 )
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
 @router.post(
     "",
     response_model=MessageResponse,
-    status_code=201,
+    status_code=status.HTTP_201_CREATED,
 )
 def create_message_endpoint(
     message: MessageCreate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     conversation = get_conversation(
         db,
@@ -36,12 +30,18 @@ def create_message_endpoint(
 
     if conversation is None:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Conversation not found",
         )
 
+    if conversation.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied",
+        )
+
     return create_message(
-        db,
+        db=db,
         conversation_id=message.conversation_id,
         role=message.role,
         content=message.content,
@@ -55,6 +55,7 @@ def create_message_endpoint(
 def list_messages_endpoint(
     conversation_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     conversation = get_conversation(
         db,
@@ -63,11 +64,17 @@ def list_messages_endpoint(
 
     if conversation is None:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Conversation not found",
         )
 
+    if conversation.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied",
+        )
+
     return list_messages(
-        db,
+        db=db,
         conversation_id=conversation_id,
     )

@@ -4,15 +4,10 @@ from app.core.config import settings
 
 
 class LLMService:
-    def chat(self, message: str) -> str:
+    def chat(self, messages: list[dict]) -> str:
         response = ollama.chat(
             model=settings.MODEL_NAME,
-            messages=[
-                {
-                    "role": "user",
-                    "content": message,
-                }
-            ],
+            messages=messages,
         )
 
         return response["message"]["content"]
