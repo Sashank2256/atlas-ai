@@ -1,3 +1,15 @@
-from app.schemas.health import HealthResponse
+from app.schemas.conversation import (
+    ConversationCreate,
+    ConversationResponse,
+)
+from app.schemas.message import (
+    MessageCreate,
+    MessageResponse,
+)
 
-__all__ = ["HealthResponse"]
+__all__ = [
+    "ConversationCreate",
+    "ConversationResponse",
+    "MessageCreate",
+    "MessageResponse",
+]
