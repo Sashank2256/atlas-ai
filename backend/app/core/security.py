@@ -1,3 +1,4 @@
+import secrets
 from datetime import datetime, timedelta, timezone
 
 from jose import JWTError, jwt
@@ -42,3 +43,10 @@ def decode_access_token(token: str):
         return payload
     except JWTError:
         return None
+
+
+def create_refresh_token() -> str:
+    """
+    Generate a cryptographically secure refresh token.
+    """
+    return secrets.token_urlsafe(64)
