@@ -6,6 +6,7 @@ from app.crud.conversation import get_conversation
 from app.crud.message import create_message, list_messages
 from app.db.models.user import User
 from app.schemas import MessageCreate, MessageResponse
+from app.services.chat_service import chat_service
 
 router = APIRouter(
     prefix="/messages",
@@ -14,18 +15,19 @@ router = APIRouter(
 
 
 @router.post(
-    "",
+    "/{conversation_id}",
     response_model=MessageResponse,
     status_code=status.HTTP_201_CREATED,
 )
 def create_message_endpoint(
+    conversation_id: int,
     message: MessageCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     conversation = get_conversation(
         db,
-        message.conversation_id,
+        conversation_id,
     )
 
     if conversation is None:
@@ -40,12 +42,11 @@ def create_message_endpoint(
             detail="Access denied",
         )
 
-    return create_message(
-        db=db,
-        conversation_id=message.conversation_id,
-        role=message.role,
-        content=message.content,
-    )
+    return chat_service.send_message(
+    db=db,
+    conversation_id=conversation_id,
+    content=message.content,
+)
 
 
 @router.get(

@@ -5,8 +5,9 @@ from pydantic import BaseModel, ConfigDict
 
 class ConversationCreate(BaseModel):
     title: str
-    user_id: int
 
+class ConversationUpdate(BaseModel):
+    title: str
 
 class ConversationResponse(BaseModel):
     id: int

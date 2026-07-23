@@ -7,9 +7,14 @@ from app.crud.conversation import (
     delete_conversation,
     get_conversation,
     list_conversations,
+    update_conversation,
 )
 from app.db.models.user import User
-from app.schemas import ConversationCreate, ConversationResponse
+from app.schemas.conversation import (
+    ConversationCreate,
+    ConversationResponse,
+    ConversationUpdate,
+)
 
 router = APIRouter(
     prefix="/conversations",
@@ -98,3 +103,33 @@ def delete_conversation_endpoint(
         )
 
     delete_conversation(db, conversation)
+
+@router.patch(
+    "/{conversation_id}",
+    response_model=ConversationResponse,
+)
+def update_conversation_endpoint(
+    conversation_id: int,
+    conversation_update: ConversationUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    conversation = get_conversation(db, conversation_id)
+
+    if conversation is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Conversation not found",
+        )
+
+    if conversation.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied",
+        )
+
+    return update_conversation(
+        db=db,
+        conversation=conversation,
+        title=conversation_update.title,
+    )

@@ -46,6 +46,21 @@ def list_conversations(
         .all()
     )
 
+def update_conversation(
+    db: Session,
+    conversation: Conversation,
+    *,
+    title: str,
+) -> Conversation:
+    """Update a conversation."""
+
+    conversation.title = title
+
+    db.commit()
+    db.refresh(conversation)
+
+    return conversation
+
 
 def delete_conversation(
     db: Session,
