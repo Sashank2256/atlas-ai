@@ -7,6 +7,7 @@ from app.api.v1.health import router as health_router
 from app.api.v1.messages import router as messages_router
 from app.core.config import settings
 from app.core.middleware import log_requests
+from app.core.exceptions import register_exception_handlers
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -15,7 +16,7 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
 )
-
+register_exception_handlers(app)
 app.middleware("http")(log_requests)
 
 app.include_router(health_router)
